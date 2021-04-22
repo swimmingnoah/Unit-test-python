@@ -8,6 +8,8 @@ apikey = "O1RSZBGP6WA65EAI"
 
 # THIS FUNCTION ASKS THE USER FOR THE VARIABLES FOR THE CODE TO RUN
 # (TICKER , CHART TYPE, CHART TIME SERIES, START DAY , END DAY)
+
+
 def userPrompt():
 
     tickerSymbol = input("Please Enter a Stock Ticker Symbol: ").upper()
@@ -25,11 +27,14 @@ def userPrompt():
     endDate = dateInputEnd(startDate)
 
     # THIS RETURNS A TUPLE TO THE getJsonPage() FUNCTION
-    unit = (tickerSymbol, chartType, chartTimeSeries, startDate, endDate, intradayInterval)
+    unit = (tickerSymbol, chartType, chartTimeSeries,
+            startDate, endDate, intradayInterval)
     return unit
+
 
 def isTickerSymbolUpper(input):
     return input.upper()
+
 
 def isTickerSymbolLengthValid(input):
     if 1 <= len(input) <= 7:
@@ -37,26 +42,14 @@ def isTickerSymbolLengthValid(input):
     else:
         return False
 
+
 def isTickerSymbolAlpha(input):
     if input.isalpha():
         return True
     else:
         return False
 
-# def tickerSymbolInput():
-#     while True:
-#         try:
-#             tickerSymbol = input("Please Enter a Stock Ticker Symbol: ")
-#             if not isTickerSymbolAlpha:
-#                 print("Please enter an alphabetic string")
-#             elif not isTickerSymbolUpper:
-#                 print("Please enter an uppercase string")
-#             elif not isTickerSymbolLengthValid:
-#                 print("Please enter a string between 1 and 7 characters long")
-#             else:
-#                 return tickerSymbol
 
-# THIS FUNCTION ASKS THE USER FOR THE CHARTTYPE VARIABLE, IT SHOULD ONLY ACCEPT A 1 OR 2
 def chartInput():
     while True:
         try:
@@ -72,8 +65,10 @@ def chartInput():
         except ValueError:
             print("ERROR - Enter an Integer")
 
+
 def isChartValid(input):
     return input not in [1, 2]
+
 
 def timeSeriesInput():
     while True:
@@ -84,7 +79,8 @@ def timeSeriesInput():
             print("2. Daily")
             print("3. Weekly")
             print("4. Monthly\n")
-            chartTimeSeries = int(input("Please Enter a Chart Time Series(1,2,3,4): "))
+            chartTimeSeries = int(
+                input("Please Enter a Chart Time Series(1,2,3,4): "))
             if isTimeSeriesValid(chartTimeSeries):
                 print("Enter a 1, 2, 3, or 4 for Chart Time Series")
             else:
@@ -92,8 +88,10 @@ def timeSeriesInput():
         except ValueError:
             print("ERROR - Enter an Integer")
 
+
 def isTimeSeriesValid(input):
     return input not in [1, 2, 3, 4]
+
 
 def intradayIntervalInput():
     while True:
@@ -105,13 +103,15 @@ def intradayIntervalInput():
             print("3. 15 minute")
             print("4. 30 minute")
             print("5. 60 minute\n")
-            intradayInterval = int(input("Please Enter a Intraday Interval(1,2,3,4,5): "))
+            intradayInterval = int(
+                input("Please Enter a Intraday Interval(1,2,3,4,5): "))
             if intradayInterval not in [1, 2, 3, 4, 5]:
                 print("Enter a 1, 2, 3, 4, or 5 for Intraday Interval")
             else:
                 return intradayInterval
         except ValueError:
             print("ERROR - Enter an Integer")
+
 
 def dateNotInTheFuture(date_info):
     currentDate = datetime.date.today().strftime('%Y-%m-%d')
@@ -194,6 +194,7 @@ def reverseLists(opening, highs, lows, closing, dates):
     closing.reverse()
     dates.reverse()
 
+
 def makeGraph(data, chartType, chartTimeSeries, chartStartDate, chartEndDate):
     ticker = data['Meta Data']['2. Symbol']
 
@@ -215,16 +216,19 @@ def makeGraph(data, chartType, chartTimeSeries, chartStartDate, chartEndDate):
                 # CHECK IF THE CHART START DATE IS IN THE STRING OF DATE1
                 if str(chartStartDate) in date:
                     # IF IT IS - SPLIT THEM AT THE SPACE AND ONLY TAKE THE TIME PORTION.
-                    createData(dailyInformation, date, opening, highs, lows, closing, dates, 1)
+                    createData(dailyInformation, date, opening,
+                               highs, lows, closing, dates, 1)
 
         # IF THE USER WANTS A GRAPH OF OVER 1 DAY
         else:
             # IF THE LOOP INDEX (AKA DATE) IS IN BETWEEN THE START AND STOP DATE, PULL THE DATA
             if chartStartDate < date < chartEndDate or chartEndDate in date:
-                createData(dailyInformation, date, opening, highs, lows, closing, dates, 0)
+                createData(dailyInformation, date, opening,
+                           highs, lows, closing, dates, 0)
 
     line_chart = chartType
-    line_chart.title = 'Stock Data for {}: {} to {} '.format(ticker, chartStartDate, chartEndDate)
+    line_chart.title = 'Stock Data for {}: {} to {} '.format(
+        ticker, chartStartDate, chartEndDate)
     # WE NEED TO REVERSE THE LISTS BECAUSE OUR LISTS ARE BACKWARDS AT THE MOMENT
     reverseLists(opening, highs, lows, closing, dates)
     line_chart.x_labels = dates
@@ -249,21 +253,34 @@ def getJsonPage():
     # THOSE VARIABLES ARE BROKEN DOWN INTO API ENDPOINT COMPONENTS
     # E.G (TIME_SERIES_INTRADAY,TIME_SERIES_DAILY) OR THEIR RESPECTIVE DATES TO BE LOOKED FOR WITHIN THE API RESULTS
     chartType = info[1]
-    if chartType == 1: chartType = pygal.Bar(x_label_rotation=-45, x_labels_major_every=1, show_minor_x_labels=False)
-    elif chartType == 2: chartType = pygal.Line(x_label_rotation=-45, x_labels_major_every=1, show_minor_x_labels=False)
+    if chartType == 1:
+        chartType = pygal.Bar(x_label_rotation=-45,
+                              x_labels_major_every=1, show_minor_x_labels=False)
+    elif chartType == 2:
+        chartType = pygal.Line(
+            x_label_rotation=-45, x_labels_major_every=1, show_minor_x_labels=False)
 
     chartTimeSeries = info[2]
     intraDayInfo = info[5]
-    if intraDayInfo == 1: intraDayInfo = "&interval=1min"
-    elif intraDayInfo == 2: intraDayInfo = "&interval=5min"
-    elif intraDayInfo == 3: intraDayInfo = "&interval=15min"
-    elif intraDayInfo == 4: intraDayInfo = "&interval=30min"
-    elif intraDayInfo == 5: intraDayInfo = "&interval=60min"
+    if intraDayInfo == 1:
+        intraDayInfo = "&interval=1min"
+    elif intraDayInfo == 2:
+        intraDayInfo = "&interval=5min"
+    elif intraDayInfo == 3:
+        intraDayInfo = "&interval=15min"
+    elif intraDayInfo == 4:
+        intraDayInfo = "&interval=30min"
+    elif intraDayInfo == 5:
+        intraDayInfo = "&interval=60min"
 
-    if chartTimeSeries == 1: chartTimeSeries = "TIME_SERIES_INTRADAY"
-    elif chartTimeSeries == 2: chartTimeSeries = "TIME_SERIES_DAILY"
-    elif chartTimeSeries == 3: chartTimeSeries = "TIME_SERIES_WEEKLY"
-    elif chartTimeSeries == 4: chartTimeSeries = "TIME_SERIES_MONTHLY"
+    if chartTimeSeries == 1:
+        chartTimeSeries = "TIME_SERIES_INTRADAY"
+    elif chartTimeSeries == 2:
+        chartTimeSeries = "TIME_SERIES_DAILY"
+    elif chartTimeSeries == 3:
+        chartTimeSeries = "TIME_SERIES_WEEKLY"
+    elif chartTimeSeries == 4:
+        chartTimeSeries = "TIME_SERIES_MONTHLY"
 
     chartStartDate = info[3]
     chartEndDate = info[4]
@@ -271,9 +288,10 @@ def getJsonPage():
     # AFTER THE VARIABLES ARE ASSIGNED WE BUILD THE LINK AND EXECUTE THE GET REQUEST.
     # -> WE PRINT THE BUILT URL TO THE CONSOLE FOR DEBUGGING PURPOSES
     baseLink = "https://www.alphavantage.co/query?"
-    queryData = "function={}&symbol={}{}&apikey={}".format(chartTimeSeries, symbol, intraDayInfo, apikey)
+    queryData = "function={}&symbol={}{}&apikey={}".format(
+        chartTimeSeries, symbol, intraDayInfo, apikey)
     req = requests.get(baseLink + queryData)
-    #print(req.url)
+    # print(req.url)
 
     # WE LOAD THE REQUEST RESPONSE INTO A VARIABLE CALLED DATA AND USE THE JSON() FUNCTION TO PARSE THE TEXT.
     data = req.json()
@@ -281,7 +299,8 @@ def getJsonPage():
     # FINALLY, WE CHECK IF THERE WAS A STRING OF 'INVALID API CALL' IN THE RESPONSE
     # IF THERE IS WE PRINT AN ERROR MESSAGE INSTEAD OF BUILDING THE GRAPH IN BROWSER
     if 'Invalid API call' not in req.text:
-        makeGraph(data, chartType, chartTimeSeries, chartStartDate, chartEndDate)
+        makeGraph(data, chartType, chartTimeSeries,
+                  chartStartDate, chartEndDate)
     else:
         print("The Ticker You Entered is Not in The API\n")
 
